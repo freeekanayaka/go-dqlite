@@ -276,3 +276,36 @@ func DecodeMetadata(response *Message) (failureDomain uint64, weight uint64, err
 
 	return
 }
+
+// DecodeMemory decodes a Memory response.
+func DecodeMemory(response *Message) (mallocCount uint64, memoryUsed uint64, memoryWatermark uint64, logSize uint64, logN uint64, logRefs uint64, logLost uint64, logEnd uint64, logMissedSuffix uint64, logMissedPrefix uint64, logMissedRelease uint64, vfs uint64, err error) {
+	mtype, _ := response.getHeader()
+
+	if mtype == ResponseFailure {
+		e := ErrRequest{}
+		e.Code = response.getUint64()
+		e.Description = response.getString()
+                err = e
+                return
+	}
+
+	if mtype != ResponseMemory {
+		err = fmt.Errorf("decode %s: unexpected type %d", responseDesc(ResponseMemory), mtype)
+                return
+	}
+
+	mallocCount = response.getUint64()
+	memoryUsed = response.getUint64()
+	memoryWatermark = response.getUint64()
+	logSize = response.getUint64()
+	logN = response.getUint64()
+	logRefs = response.getUint64()
+	logLost = response.getUint64()
+	logEnd = response.getUint64()
+	logMissedSuffix = response.getUint64()
+	logMissedPrefix = response.getUint64()
+	logMissedRelease = response.getUint64()
+	vfs = response.getUint64()
+
+	return
+}

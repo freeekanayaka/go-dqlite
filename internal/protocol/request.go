@@ -170,3 +170,11 @@ func EncodeWeight(request *Message, weight uint64) {
 
 	request.putHeader(RequestWeight)
 }
+
+// EncodeProfile encodes a Profile request.
+func EncodeProfile(request *Message) {
+	request.reset()
+	request.putUint64(0)
+
+	request.putHeader(RequestProfile)
+}

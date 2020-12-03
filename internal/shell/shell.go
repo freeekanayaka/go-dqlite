@@ -65,6 +65,11 @@ func (s *Shell) Process(ctx context.Context, line string) (string, error) {
 		return s.processCluster(ctx, line)
 	case ".leader":
 		return s.processLeader(ctx, line)
+	case ".profile":
+		return s.processProfile(ctx, line)
+	}
+	if strings.HasPrefix(strings.ToLower(strings.TrimLeft(line, " ")), ".remove") {
+		return s.processRemove(ctx, line)
 	}
 	if strings.HasPrefix(strings.ToLower(strings.TrimLeft(line, " ")), ".remove") {
 		return s.processRemove(ctx, line)
@@ -111,6 +116,31 @@ func (s *Shell) processCluster(ctx context.Context, line string) (string, error)
 	}
 
 	return result, nil
+}
+
+func (s *Shell) processProfile(ctx context.Context, line string) (string, error) {
+	cli, err := client.FindLeader(ctx, s.store, client.WithDialFunc(s.dial))
+	if err != nil {
+		return "", err
+	}
+	cluster, err := cli.Cluster(ctx)
+	if err != nil {
+		return "", err
+	}
+	result := make([]string, len(cluster))
+	for i, node := range cluster {
+		cli, err := client.New(ctx, node.Address, client.WithDialFunc(s.dial))
+		if err != nil {
+			return "", err
+		}
+		stats, err := cli.Profile(ctx)
+		if err != nil {
+			return "", err
+		}
+		result[i] = fmt.Sprintf("%s: malloc-count %d, memory-used %d, memory-watermark %d, log-size %d, log-n %d, log-refs %d, log-lost %d, log-end %d, log-missed-suffix %d, log-missed-prefix %d, log-missed-release %d, vfs %d",
+			node.Address, stats.MallocCount, stats.MemoryUsed, stats.MemoryWatermark, stats.LogSize, stats.LogN, stats.LogRefs, stats.LogLost, stats.LogEnd, stats.LogMissedSuffix, stats.LogMissedPrefix, stats.LogMissedRelease, stats.Vfs)
+	}
+	return strings.Join(result, "\n"), nil
 }
 
 func (s *Shell) processLeader(ctx context.Context, line string) (string, error) {

@@ -305,6 +305,42 @@ func (c *Client) Weight(ctx context.Context, weight uint64) error {
 	return nil
 }
 
+type Stats struct {
+	MallocCount      uint64
+	MemoryUsed       uint64
+	MemoryWatermark  uint64
+	LogSize          uint64
+	LogN             uint64
+	LogRefs          uint64
+	LogLost          uint64
+	LogEnd           uint64
+	LogMissedSuffix  uint64
+	LogMissedPrefix  uint64
+	LogMissedRelease uint64
+	Vfs              uint64
+}
+
+func (c *Client) Profile(ctx context.Context) (*Stats, error) {
+	request := protocol.Message{}
+	request.Init(4096)
+	response := protocol.Message{}
+	response.Init(4096)
+
+	protocol.EncodeProfile(&request)
+
+	err := c.protocol.Call(ctx, &request, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	s := &Stats{}
+	s.MallocCount, s.MemoryUsed, s.MemoryWatermark, s.LogSize, s.LogN, s.LogRefs, s.LogLost, s.LogEnd, s.LogMissedSuffix, s.LogMissedPrefix, s.LogMissedRelease, s.Vfs, err = protocol.DecodeMemory(&response)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
 // Close the client.
 func (c *Client) Close() error {
 	return c.protocol.Close()

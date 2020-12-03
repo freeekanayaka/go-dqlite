@@ -156,6 +156,21 @@ func TestClient_Describe(t *testing.T) {
 	assert.Equal(t, uint64(123), metadata.Weight)
 }
 
+func TestClient_Profile(t *testing.T) {
+	node, cleanup := newNode(t)
+	defer cleanup()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	cli, err := client.New(ctx, node.BindAddress())
+	require.NoError(t, err)
+	defer cli.Close()
+
+	_, _, err = cli.Profile(context.Background())
+	require.NoError(t, err)
+}
+
 func newNode(t *testing.T) (*dqlite.Node, func()) {
 	t.Helper()
 	dir, dirCleanup := newDir(t)

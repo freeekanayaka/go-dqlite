@@ -56,6 +56,7 @@ const (
 	RequestTransfer  = 17
 	RequestDescribe  = 18
 	RequestWeight    = 19
+	RequestProfile   = 20
 )
 
 // Formats
@@ -77,6 +78,7 @@ const (
 	ResponseEmpty      = 8
 	ResponseFiles      = 9
 	ResponseMetadata   = 10
+	ResponseMemory     = 11
 )
 
 // Human-readable description of a request type.

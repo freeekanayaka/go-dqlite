@@ -21,6 +21,7 @@ package protocol
 //go:generate ./schema.sh --request Transfer  id:uint64
 //go:generate ./schema.sh --request Describe  format:uint64
 //go:generate ./schema.sh --request Weight    weight:uint64
+//go:generate ./schema.sh --request Profile    unused:uint64
 
 //go:generate ./schema.sh --response init
 //go:generate ./schema.sh --response Failure  code:uint64 message:string
@@ -35,3 +36,4 @@ package protocol
 //go:generate ./schema.sh --response Rows     rows:Rows
 //go:generate ./schema.sh --response Files    files:Files
 //go:generate ./schema.sh --response Metadata failureDomain:uint64 weight:uint64
+//go:generate ./schema.sh --response Memory mallocCount:uint64 memoryUsed:uint64 memoryWatermark:uint64 logSize:uint64 logN:uint64 logRefs:uint64 logLost:uint64 logEnd:uint64 logMissedSuffix:uint64 logMissedPrefix:uint64 logMissedRelease:uint64 vfs:uint64
